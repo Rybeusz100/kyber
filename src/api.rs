@@ -6,6 +6,9 @@ use crate::{
   kex::{PublicKey, SecretKey, Encapsulated, Decapsulated}
 };
 
+use serde::{Serialize, Deserialize};
+use serde_big_array::BigArray;
+
 /// Keypair generation with a provided RNG.
 /// 
 /// ### Example
@@ -78,9 +81,11 @@ pub fn decapsulate(ct: &[u8], sk: &[u8]) -> Decapsulated
 /// A public/secret keypair for use with Kyber. 
 /// 
 /// Byte lengths of the keys are determined by the security level chosen.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Keypair {
+    #[serde(with = "BigArray")]
     pub public: PublicKey,
+    #[serde(with = "BigArray")]
     pub secret: SecretKey
 }
 
