@@ -22,9 +22,9 @@ pub type Encapsulated =  Result<([u8; KYBER_CIPHERTEXTBYTES], [u8; KYBER_SSBYTES
 /// The result of  decapsulating a ciphertext which produces a shared secret when confirmed
 pub type Decapsulated = Result<[u8; KYBER_SSBYTES], KyberError>;
 /// Kyber public key
-pub type PublicKey = [u8; KYBER_PUBLICKEYBYTES];
+pub type KyberPublicKey = [u8; KYBER_PUBLICKEYBYTES];
 /// Kyber secret key
-pub type SecretKey = [u8; KYBER_SECRETKEYBYTES];
+pub type KyberSecretKey = [u8; KYBER_SECRETKEYBYTES];
 /// Kyber Shared Secret
 pub type SharedSecret = [u8; KYBER_SSBYTES]; 
 /// Bytes to send when initiating a unilateral key exchange
@@ -104,7 +104,7 @@ impl Uake {
   /// let client_init = alice.client_init(&bob_keys.public, &mut rng)?;
   /// # Ok(()) }
   /// ```
-  pub fn client_init<R>(&mut self, pubkey: &PublicKey, rng: &mut R) 
+  pub fn client_init<R>(&mut self, pubkey: &KyberPublicKey, rng: &mut R) 
   -> Result<UakeSendInit, KyberError>
     where R: CryptoRng + RngCore
   {
@@ -127,7 +127,7 @@ impl Uake {
   /// let server_send = bob.server_receive(client_init, &bob_keys.secret, &mut rng)?;
   /// # Ok(()) }
   pub fn server_receive<R>(
-    &mut self, send_a: UakeSendInit, secretkey: &SecretKey, rng: &mut R
+    &mut self, send_a: UakeSendInit, secretkey: &KyberSecretKey, rng: &mut R
   ) 
   -> Result<UakeSendResponse, KyberError>
     where R: CryptoRng + RngCore
@@ -231,7 +231,7 @@ impl Ake {
   /// let client_init = alice.client_init(&bob_keys.public, &mut rng)?;
   /// # Ok(()) }
   /// ```
-  pub fn client_init<R>(&mut self, pubkey: &PublicKey, rng: &mut R) 
+  pub fn client_init<R>(&mut self, pubkey: &KyberPublicKey, rng: &mut R) 
   -> Result<AkeSendInit, KyberError>
     where R: CryptoRng + RngCore
   {
@@ -255,8 +255,8 @@ impl Ake {
   /// let server_send = bob.server_receive(client_init, &alice_keys.public, &bob_keys.secret, &mut rng)?;
   /// # Ok(()) }
   pub fn server_receive<R>(
-    &mut self, ake_send_a: AkeSendInit, pubkey: &PublicKey, 
-    secretkey: &SecretKey, rng: &mut R
+    &mut self, ake_send_a: AkeSendInit, pubkey: &KyberPublicKey, 
+    secretkey: &KyberSecretKey, rng: &mut R
   ) 
   -> Result<AkeSendResponse, KyberError>
     where R: CryptoRng + RngCore 
@@ -283,7 +283,7 @@ impl Ake {
   /// let client_confirm = alice.client_confirm(server_send, &alice_keys.secret);
   /// assert_eq!(alice.shared_secret, bob.shared_secret);
   /// # Ok(()) }
-  pub fn client_confirm(&mut self, send_b: AkeSendResponse, secretkey: &SecretKey) 
+  pub fn client_confirm(&mut self, send_b: AkeSendResponse, secretkey: &KyberSecretKey) 
   -> Result<(), KyberError> 
   {
     ake_shared_a(

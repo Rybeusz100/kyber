@@ -3,7 +3,7 @@ use crate::{
   error::KyberError,
   RngCore, CryptoRng,
   kem::*,
-  kex::{PublicKey, SecretKey, Encapsulated, Decapsulated}
+  kex::{KyberPublicKey, KyberSecretKey, Encapsulated, Decapsulated}
 };
 
 use serde::{Serialize, Deserialize};
@@ -84,9 +84,9 @@ pub fn decapsulate(ct: &[u8], sk: &[u8]) -> Decapsulated
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Keypair {
     #[serde(with = "BigArray")]
-    pub public: PublicKey,
+    pub public: KyberPublicKey,
     #[serde(with = "BigArray")]
-    pub secret: SecretKey
+    pub secret: KyberSecretKey
 }
 
 impl Keypair {
@@ -131,7 +131,7 @@ pub fn derive(seed: &[u8]) -> Result<Keypair, KyberError>
 }
 
 /// Extracts public key from private key.
-pub fn public(sk: &[u8]) -> PublicKey
+pub fn public(sk: &[u8]) -> KyberPublicKey
 {
   let mut pk = [0u8; KYBER_INDCPA_PUBLICKEYBYTES];
   pk.copy_from_slice(
