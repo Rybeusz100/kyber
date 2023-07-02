@@ -19,13 +19,13 @@ use serde_big_array::BigArray;
 /// let keys = keypair(&mut rng)?;
 /// # Ok(())}
 /// ```
-pub fn keypair<R>(rng: &mut R) -> Result<Keypair, KyberError>
+pub fn keypair<R>(rng: &mut R) -> Result<KyberKeypair, KyberError>
   where R: RngCore + CryptoRng
 {
   let mut public = [0u8; KYBER_PUBLICKEYBYTES];
   let mut secret = [0u8; KYBER_SECRETKEYBYTES];
   crypto_kem_keypair(&mut public, &mut secret, rng, None)?;
-  Ok(Keypair { public, secret })
+  Ok(KyberKeypair { public, secret })
 }
 
 /// Encapsulates a public key returning the ciphertext to send
@@ -82,27 +82,27 @@ pub fn decapsulate(ct: &[u8], sk: &[u8]) -> Decapsulated
 /// 
 /// Byte lengths of the keys are determined by the security level chosen.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
-pub struct Keypair {
+pub struct KyberKeypair {
     #[serde(with = "BigArray")]
     pub public: KyberPublicKey,
     #[serde(with = "BigArray")]
     pub secret: KyberSecretKey
 }
 
-impl Keypair {
+impl KyberKeypair {
   /// Securely generates a new keypair`
   /// ```
   /// # use pqc_kyber::*;
   /// # fn main() -> Result<(), KyberError> {
   /// let mut rng = rand::thread_rng();
-  /// let keys = Keypair::generate(&mut rng)?;
-  /// # let empty_keys = Keypair{
+  /// let keys = KyberKeypair::generate(&mut rng)?;
+  /// # let empty_keys = KyberKeypair{
   ///   public: [0u8; KYBER_PUBLICKEYBYTES], secret: [0u8; KYBER_SECRETKEYBYTES]
   /// };
   /// # assert!(empty_keys != keys); 
   /// # Ok(()) }
   /// ```
-  pub fn generate<R: CryptoRng + RngCore>(rng: &mut R) -> Result<Keypair, KyberError> {
+  pub fn generate<R: CryptoRng + RngCore>(rng: &mut R) -> Result<KyberKeypair, KyberError> {
     keypair(rng)
   }
 }
@@ -118,7 +118,7 @@ impl RngCore for DummyRng{
 
 /// Deterministically derive a keypair from a seed as specified
 /// in draft-schwabe-cfrg-kyber.
-pub fn derive(seed: &[u8]) -> Result<Keypair, KyberError>
+pub fn derive(seed: &[u8]) -> Result<KyberKeypair, KyberError>
 {
   let mut public = [0u8; KYBER_PUBLICKEYBYTES];
   let mut secret = [0u8; KYBER_SECRETKEYBYTES];
@@ -127,7 +127,7 @@ pub fn derive(seed: &[u8]) -> Result<Keypair, KyberError>
     return Err(KyberError::InvalidInput)
   }
   crypto_kem_keypair(&mut public, &mut secret, &mut _rng, Some((&seed[..32], &seed[32..])))?;
-  Ok(Keypair { public, secret })
+  Ok(KyberKeypair { public, secret })
 }
 
 /// Extracts public key from private key.
